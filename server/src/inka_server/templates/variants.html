@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}{{ name }} – varianty ditheringu – Inka{% endblock %}
+{% block body %}
+<section class="cmp cmp--variants" data-compare data-w="{{ w }}" data-h="{{ h }}">
+  <header class="cmp__head">
+    <a class="cmp__back" href="{{ back }}">← Porovnání</a>
+    <h1 class="cmp__title" title="{{ name }}">{{ name|stem }}: varianty ditheringu</h1>
+  </header>
+  <div class="cmp__tools">
+    <div class="segmented segmented--small" role="group" aria-label="Zvětšení">
+      {% for z, label in [("fit","Přizpůsobit"),("1","100 %"),("2","200 %"),("4","400 %")] %}
+      <label><input type="radio" name="zoom" value="{{ z }}" {% if loop.first %}checked{% endif %}><span>{{ label }}</span></label>
+      {% endfor %}
+    </div>
+    <p class="fine cmp__hint">Táhněte myší nebo prstem; všechny výřezy se posouvají spolu.</p>
+  </div>
+  <div class="variants" style="--w: {{ w }}; --h: {{ h }}">
+    <figure class="cmp__pane">
+      <figcaption>Originál</figcaption>
+      <div class="cmp__viewport" data-viewport>
+        <img class="cmp__img" data-img="source" alt="Originál" draggable="false" src="/photo/{{ name|urlname }}/source.png" width="{{ w }}" height="{{ h }}">
+      </div>
+    </figure>
+    {% for m, label, current in variants %}
+    <figure class="cmp__pane">
+      <figcaption>{{ label }}{% if current %} <span class="fine">· nastaveno</span>{% endif %}</figcaption>
+      <div class="cmp__viewport" data-viewport>
+        <img class="cmp__img" data-img="{{ m }}" alt="{{ label }}" draggable="false" loading="lazy"
+             src="/photo/{{ name|urlname }}/preview.png?dither={{ m }}{{ extra }}" width="{{ w }}" height="{{ h }}">
+      </div>
+    </figure>
+    {% endfor %}
+  </div>
+</section>
+{% endblock %}

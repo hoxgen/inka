@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="cs">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Inka{% endblock %}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;1,6..72,400&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 6 1%27%3E%3Crect width=%271%27 height=%271%27 fill=%27%23222%27/%3E%3Crect x=%271%27 width=%271%27 height=%271%27 fill=%27%23eee%27/%3E%3Crect x=%272%27 width=%271%27 height=%271%27 fill=%27%23d4c228%27/%3E%3Crect x=%273%27 width=%271%27 height=%271%27 fill=%27%23a01e1e%27/%3E%3Crect x=%274%27 width=%271%27 height=%271%27 fill=%27%23205aaa%27/%3E%3Crect x=%275%27 width=%271%27 height=%271%27 fill=%27%23285a3c%27/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="/static/inka.css?v={{ asset_v }}">
+  <script src="/static/inka.js?v={{ asset_v }}" defer></script>
+</head>
+<body>
+  <div class="colorbar" aria-hidden="true">
+    {% for c in palette %}<span style="background: rgb({{ c[0] }} {{ c[1] }} {{ c[2] }})"></span>{% endfor %}
+  </div>
+  <header class="masthead">
+    <a class="wordmark" href="/">Inka</a>
+    <nav>
+      <a href="/" {% if request.url.path == "/" %}aria-current="page"{% endif %}>Fotky</a>
+      <a href="/navod" {% if request.url.path == "/navod" %}aria-current="page"{% endif %}>Návod</a>
+      <a href="/settings" {% if request.url.path == "/settings" %}aria-current="page"{% endif %}>Nastavení</a>
+    </nav>
+  </header>
+  <main>{% block body %}{% endblock %}</main>
+</body>
+</html>

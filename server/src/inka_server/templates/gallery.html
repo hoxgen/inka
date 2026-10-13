@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block body %}
+<section class="onwall">
+  <div class="onwall__print" style="--aspect: {{ aspect }}">
+    {% if current %}
+      <img src="/photo/{{ current|urlname }}/preview.png" alt="Na zdi: {{ current }}" data-loupe>
+      <span class="stamp">Na zdi</span>
+    {% else %}
+      <div class="onwall__blank">{% if all_hidden %}Všechno je vyřazené.{% else %}Rámeček zatím nic nezobrazil.{% endif %}</div>
+    {% endif %}
+  </div>
+  <div class="onwall__text">
+    <h1>{% if current %}{{ current|stem }}{% else %}Prázdná stěna{% endif %}</h1>
+    {% if all_hidden %}
+      <p class="notice">Všechny fotky jsou vyřazené – rámeček nemá co promítat a nechá na zdi poslední obraz. Vraťte některou do rotace.</p>
+    {% elif current_hidden %}
+      <p class="notice">Tahle fotka je vyřazená; při příští změně zmizí.</p>
+    {% endif %}
+    <div class="debug">
+      {% if debug_until %}
+        <p class="fine"><strong>Ladicí režim do {{ debug_until }}.</strong> Rámeček se ptá každých 30&nbsp;s; „Zobrazit hned“ se projeví do minuty.</p>
+        <form method="post" action="/debug"><input type="hidden" name="on" value="0"><input type="hidden" name="next" value="/"><button class="link">Vypnout ladicí režim</button></form>
+      {% else %}
+        <form method="post" action="/debug"><input type="hidden" name="on" value="1"><input type="hidden" name="next" value="/"><button class="link">Zapnout ladicí režim</button></form>
+        <span class="fine">na hodinu: rámeček se bude ptát každých 30&nbsp;s.</span>
+      {% endif %}
+    </div>
+    {% if pinned %}<p class="fine">Další na řadě: <a href="#p-{{ pinned|urlname }}">{{ pinned }}</a>. Rámeček ji ukáže při nejbližším probuzení.</p>{% endif %}
+    {% if status %}
+      <p class="lede">Rámeček se ozval {{ status.seen_ago }}{% if status.battery is not none %}, baterie {{ status.battery }}&nbsp;%{% if status.charging %} (nabíjí se){% endif %}{% endif %}{% if status.temp %}, {{ status.temp }}&nbsp;°C{% endif %}{% if status.usb is true %}, napájení z USB{% elif status.usb is false %}, z baterie{% endif %}.
+        Další fotka v&nbsp;{{ status.next_at }}, mění se každých {{ interval_label|replace(' ', ' ') }}.</p>
+      <p class="fine">Firmware {{ status.fw or "?" }}. Tlačítko KEY na zadní straně přepne fotku hned.</p>
+    {% else %}
+      <p class="lede">Rámeček se zatím neozval. Až se připojí, uvidíte tu, kdy se ozval naposledy a kolik má baterie.</p>
+    {% endif %}
+    {% if current %}<p class="fine"><button class="link" type="button" data-loupe-toggle>Detail 1 : 1</button> ukáže zrno ditheringu jako na panelu.</p>{% endif %}
+  </div>
+</section>
+
+<section class="sheet" id="sheet">
+  <header class="sheet__head">
+    <h2>Kontaktní arch</h2>
+    <p class="fine">{{ counts.total }} {{ "fotka" if counts.total == 1 else ("fotky" if 2 <= counts.total <= 4 else "fotek") }}{% if counts.hidden %}, {{ counts.hidden }} vyřazeno{% endif %}</p>
+    <form class="upload" action="/upload" method="post" enctype="multipart/form-data" data-upload>
+      <label class="button">
+        Přidat fotky
+        <input type="file" name="files" accept="image/*,.heic,.heif" multiple hidden>
+      </label>
+      <noscript><button type="submit" class="button button--ghost">Nahrát</button></noscript>
+    </form>
+  </header>
+  <ol class="upload-log" data-upload-log aria-live="polite"></ol>
+
+  {% if not photos %}
+    <div class="empty">
+      <p class="empty__big">Přetáhněte sem fotky.</p>
+      <p>Nebo je vložte do složky na serveru přes Syncthing. Objeví se tu samy a rámeček je začne střídat.</p>
+    </div>
+  {% else %}
+  <ol class="prints">
+    {% for p in photos %}
+    <li class="print{% if p.hidden %} print--hidden{% endif %}{% if p.current %} print--current{% endif %}" id="p-{{ p.name|urlname }}">
+      <figure>
+        <div class="print__img" style="--aspect: {{ aspect }}">
+          <a href="/photo/{{ p.name|urlname }}/compare" class="print__open" aria-label="Porovnat {{ p.name }}"></a>
+          <img loading="lazy" src="/photo/{{ p.name|urlname }}/preview.png"
+               data-preview="/photo/{{ p.name|urlname }}/preview.png"
+               data-original="/photo/{{ p.name|urlname }}/original.jpg" alt="{{ p.name }}">
+          {% if p.current %}<span class="stamp stamp--small">Na zdi</span>{% elif p.name == pinned %}<span class="stamp stamp--small stamp--next">Další na řadě</span>{% endif %}
+        </div>
+        <figcaption>
+          <span class="frame-no">{{ "%02d"|format(p.index) }}</span>
+          <span class="print__name" title="{{ p.name }}">{{ p.name }}</span>
+        </figcaption>
+      </figure>
+      <div class="print__actions">
+        <a class="link" href="/photo/{{ p.name|urlname }}/compare">Porovnat</a>
+        <button type="button" class="link" data-toggle-original>Originál</button>
+        {% if p.hidden %}
+          <form method="post" action="/photo/{{ p.name|urlname }}/show"><button class="link">Vrátit do rotace</button></form>
+        {% else %}
+          <form method="post" action="/photo/{{ p.name|urlname }}/show-now"><button class="link">Zobrazit hned</button></form>
+          <form method="post" action="/photo/{{ p.name|urlname }}/next"><button class="link link--quiet">Další na řadě</button></form>
+          <form method="post" action="/photo/{{ p.name|urlname }}/hide"><button class="link link--quiet">Vyřadit</button></form>
+        {% endif %}
+      </div>
+    </li>
+    {% endfor %}
+  </ol>
+  {% endif %}
+</section>
+
+<div class="dropveil" data-dropveil hidden><p>Pusťte fotky</p></div>
+{% endblock %}

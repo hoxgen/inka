@@ -1,0 +1,21 @@
+[Unit]
+Description=Inka photo frame server
+After=network-online.target
+
+[Service]
+WorkingDirectory=%h/apps/inka/server
+EnvironmentFile=%h/.config/inka/env
+Environment=PHOTOS_DIR=%h/Sync/Inka_photos
+Environment=DATA_DIR=%h/.local/share/inka
+Environment=TMPDIR=%h/.local/share/inka/tmp
+Environment=INKA_TZ=Europe/Prague
+ExecStartPre=/usr/bin/mkdir -p %h/.local/share/inka/tmp
+ExecStart=%h/apps/inka/server/.venv/bin/inka-server --host 127.0.0.1 --port 8100
+Restart=always
+RestartSec=3
+MemoryMax=1G
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=default.target

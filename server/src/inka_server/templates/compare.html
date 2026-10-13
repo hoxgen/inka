@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}{{ name }} – porovnání – Inka{% endblock %}
+{% block body %}
+<section class="cmp" data-compare
+         data-src="/photo/{{ name|urlname }}/source.png"
+         data-eink="/photo/{{ name|urlname }}/preview.png"
+         data-stats="/photo/{{ name|urlname }}/stats.json"
+         data-prev="/photo/{{ prev|urlname }}/compare"
+         data-next="/photo/{{ next|urlname }}/compare"
+         data-w="{{ w }}" data-h="{{ h }}">
+  <header class="cmp__head">
+    <a class="cmp__back" href="/#p-{{ name|urlname }}">← Kontaktní arch</a>
+    <h1 class="cmp__title" title="{{ name }}">{{ name|stem }}{% if hidden %} <span class="fine">· vyřazeno</span>{% endif %}</h1>
+    <nav class="cmp__nav" aria-label="Další fotky">
+      <a class="link" href="/photo/{{ prev|urlname }}/compare" data-nav="prev" aria-keyshortcuts="ArrowLeft">←</a>
+      <span class="fine">{{ position }} / {{ total }}</span>
+      <a class="link" href="/photo/{{ next|urlname }}/compare" data-nav="next" aria-keyshortcuts="ArrowRight">→</a>
+    </nav>
+  </header>
+
+  <div class="cmp__tools">
+    <div class="segmented segmented--small" role="group" aria-label="Zvětšení">
+      {% for z, label in [("fit","Přizpůsobit"),("1","100 %"),("2","200 %"),("4","400 %")] %}
+      <label><input type="radio" name="zoom" value="{{ z }}" {% if loop.first %}checked{% endif %}><span>{{ label }}</span></label>
+      {% endfor %}
+    </div>
+    <label class="check"><input type="checkbox" data-tone-source> Originál s úpravou tónu</label>
+    <p class="fine cmp__hint">Táhněte myší nebo prstem; oba obrázky se posouvají spolu.</p>
+  </div>
+
+  <div class="cmp__panes" style="--w: {{ w }}; --h: {{ h }}">
+    <figure class="cmp__pane">
+      <figcaption>Originál</figcaption>
+      <div class="cmp__viewport" data-viewport>
+        <img class="cmp__img" data-img="source" alt="Originál {{ name }}" draggable="false"
+             src="/photo/{{ name|urlname }}/source.png" width="{{ w }}" height="{{ h }}">
+      </div>
+    </figure>
+    <figure class="cmp__pane">
+      <figcaption>E-ink <span class="fine">(6 barev panelu)</span></figcaption>
+      <div class="cmp__viewport" data-viewport>
+        <img class="cmp__img" data-img="eink" alt="E-ink {{ name }}" draggable="false"
+             src="/photo/{{ name|urlname }}/preview.png" width="{{ w }}" height="{{ h }}">
+      </div>
+    </figure>
+  </div>
+
+  <aside class="cmp__side">
+    <h2>Tisk</h2>
+    <div class="tone__sliders" data-tone>
+      {% for key, label in [("brightness","Jas"),("contrast","Kontrast"),("saturation","Sytost"),("gamma","Gama")] %}
+      <label class="slider">
+        <span>{{ label }}</span>
+        <input type="range" name="{{ key }}" min="0.5" max="2" step="0.05" value="{{ s[key] }}" data-saved="{{ saved[key] }}">
+        <output>{{ "%.2f"|format(s[key]) }}</output>
+      </label>
+      {% endfor %}
+      <label class="slider">
+        <span>Teplota</span>
+        <input type="range" name="warmth" min="-1" max="1" step="0.05" value="{{ s.warmth }}" data-saved="{{ saved.warmth }}">
+        <output>{{ "%.2f"|format(s.warmth) }}</output>
+      </label>
+<label class="slider">
+        <span>Odstín</span>
+        <input type="range" name="tint" min="-1" max="1" step="0.05" value="{{ s.tint }}" data-saved="{{ saved.tint }}">
+        <output>{{ "%.2f"|format(s.tint) }}</output>
+      </label>
+    </div>
+    <h2 class="cmp__subhead">Dithering</h2>
+    <div class="tone__sliders" data-tone>
+      <label class="select">
+        <span>Algoritmus</span>
+        <select name="dither" data-saved="{{ saved.dither }}">
+          {% for m, label in dithers %}<option value="{{ m }}" {% if s.dither == m %}selected{% endif %}>{{ label }}</option>{% endfor %}
+        </select>
+      </label>
+      {% for key, label in [("dither_strength","Rozptyl"),("grain","Zrno")] %}
+      <label class="slider">
+        <span>{{ label }}</span>
+        <input type="range" name="{{ key }}" min="0" max="1" step="0.05" value="{{ s[key] }}" data-saved="{{ saved[key] }}">
+        <output>{{ "%.2f"|format(s[key]) }}</output>
+      </label>
+      {% endfor %}
+      <p class="fine">Zrno platí pro „FS + zrno“ a „Modrý šum“. <a class="link" href="/photo/{{ name|urlname }}/variants" data-variants>Porovnat všechny algoritmy →</a></p>
+    </div>
+    <div class="cmp__actions">
+      <button class="button" type="button" data-save>Uložit jako výchozí</button>
+      <button class="link" type="button" data-revert>Vrátit</button>
+    </div>
+    <form class="cmp__show" method="post" action="/photo/{{ name|urlname }}/show-now">
+      <input type="hidden" name="next" value="/photo/{{ name|urlname }}/compare">
+      <button class="button button--ghost">Zobrazit hned na rámečku</button>
+    </form>
+    <p class="fine" data-save-status aria-live="polite">Úpravy platí pro všechny fotky. Rámeček si je vezme při příštím probuzení.</p>
+
+    <h2>Barvy panelu</h2>
+    <ul class="usage" data-usage>
+      {% for n, rgb in palette_named %}
+      <li data-color="{{ n }}">
+        <span class="usage__swatch" style="background: rgb({{ rgb[0] }} {{ rgb[1] }} {{ rgb[2] }})"></span>
+        <span class="usage__name">{{ {"black":"černá","white":"bílá","yellow":"žlutá","red":"červená","blue":"modrá","green":"zelená"}[n] }}</span>
+        <span class="usage__bar"><span style="background: rgb({{ rgb[0] }} {{ rgb[1] }} {{ rgb[2] }})"></span></span>
+        <output class="usage__pct">–</output>
+      </li>
+      {% endfor %}
+    </ul>
+    <p class="fine">Podíl pixelů, na které dithering rozložil fotku.</p>
+  </aside>
+</section>
+{% endblock %}

@@ -1,0 +1,17 @@
+debug/
+backup/
+.venv/
+__pycache__/
+firmware/build/
+firmware/sdkconfig.old
+.DS_Store
+.env
+firmware/provision.local.env
+.superpowers/
+firmware/sdkconfig
+firmware/managed_components/
+firmware/dependencies.lock
+server/.venv/
+server/**/__pycache__/
+.pytest_cache/
+.playwright-mcp/

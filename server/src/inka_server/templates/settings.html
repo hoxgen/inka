@@ -1,0 +1,98 @@
+{% extends "base.html" %}
+{% block title %}Nastavení – Inka{% endblock %}
+{% block body %}
+<form class="settings" method="post" action="/settings" data-settings>
+  <div class="settings__intro">
+    <h1>Nastavení</h1>
+    {% if saved %}<p class="notice">Uloženo. Rámeček si změny vezme při příštím probuzení.</p>{% endif %}
+  </div>
+
+  <fieldset>
+    <legend>Rytmus</legend>
+    <p class="field-label">Jak často měnit fotku</p>
+    <div class="segmented">
+      {% for value, label in intervals %}
+      <label><input type="radio" name="interval_s" value="{{ value }}" {% if s.interval_s == value %}checked{% endif %}><span>{{ label }}</span></label>
+      {% endfor %}
+      {% if s.interval_s not in intervals|map(attribute=0)|list %}
+      <label><input type="radio" name="interval_s" value="{{ s.interval_s }}" checked><span>{{ s.interval_s // 60 }} min</span></label>
+      {% endif %}
+    </div>
+    <p class="field-label">Pořadí</p>
+    <div class="segmented">
+      <label><input type="radio" name="order" value="shuffle" {% if s.order == "shuffle" %}checked{% endif %}><span>Promíchat</span></label>
+      <label><input type="radio" name="order" value="name" {% if s.order == "name" %}checked{% endif %}><span>Podle názvu</span></label>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Postavení</legend>
+    <div class="segmented">
+      <label><input type="radio" name="orientation" value="landscape" {% if s.orientation == "landscape" %}checked{% endif %} data-live><span>Na šířku</span></label>
+      <label><input type="radio" name="orientation" value="portrait" {% if s.orientation == "portrait" %}checked{% endif %} data-live><span>Na výšku</span></label>
+    </div>
+    <label class="check"><input type="checkbox" name="rotate_180" {% if s.rotate_180 %}checked{% endif %}> Otočit o 180° (rámeček stojí obráceně)</label>
+  </fieldset>
+
+  <fieldset class="tone">
+    <legend>Tisk</legend>
+    <div class="tone__grid">
+      <div class="tone__sliders">
+        {% for key, label in [("brightness","Jas"),("contrast","Kontrast"),("saturation","Sytost"),("gamma","Gama")] %}
+        <label class="slider">
+          <span>{{ label }}</span>
+          <input type="range" name="{{ key }}" min="0.5" max="2" step="0.05" value="{{ s[key] }}" data-live data-default="1">
+          <output>{{ "%.2f"|format(s[key]) }}</output>
+        </label>
+        {% endfor %}
+        <label class="slider">
+          <span>Teplota</span>
+          <input type="range" name="warmth" min="-1" max="1" step="0.05" value="{{ s.warmth }}" data-live data-default="0">
+          <output>{{ "%.2f"|format(s.warmth) }}</output>
+        </label>
+<label class="slider">
+          <span>Odstín</span>
+          <input type="range" name="tint" min="-1" max="1" step="0.05" value="{{ s.tint }}" data-live data-default="0">
+          <output>{{ "%.2f"|format(s.tint) }}</output>
+        </label>
+        <button type="button" class="link" data-tone-reset>Vrátit tón na výchozí</button>
+        <label class="select">
+          <span>Dithering</span>
+          <select name="dither" data-live>
+            {% for m, label in dithers %}<option value="{{ m }}" {% if s.dither == m %}selected{% endif %}>{{ label }}</option>{% endfor %}
+          </select>
+        </label>
+        {% for key, label in [("dither_strength","Rozptyl"),("grain","Zrno")] %}
+        <label class="slider">
+          <span>{{ label }}</span>
+          <input type="range" name="{{ key }}" min="0" max="1" step="0.05" value="{{ s[key] }}" data-live>
+          <output>{{ "%.2f"|format(s[key]) }}</output>
+        </label>
+        {% endfor %}
+      </div>
+      <div class="tone__preview" style="--aspect: {{ '5 / 3' if s.orientation == 'landscape' else '3 / 5' }}">
+        {% if sample %}
+          <img src="/photo/{{ sample|urlname }}/preview.png" data-live-preview="/photo/{{ sample|urlname }}/preview.png" alt="Náhled: {{ sample }}">
+          <p class="fine">Náhled fotky {{ sample }} s tímto nastavením.</p>
+        {% else %}
+          <p class="fine">Náhled se ukáže, až přidáte první fotku.</p>
+        {% endif %}
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset>
+    <legend>Napájení</legend>
+    <div class="segmented">
+      <label><input type="radio" name="sleep_mode" value="auto" {% if s.sleep_mode == "auto" %}checked{% endif %}><span>Automaticky</span></label>
+      <label><input type="radio" name="sleep_mode" value="light" {% if s.sleep_mode == "light" %}checked{% endif %}><span>Ze sítě</span></label>
+      <label><input type="radio" name="sleep_mode" value="deep" {% if s.sleep_mode == "deep" %}checked{% endif %}><span>Z baterie</span></label>
+    </div>
+    <p class="fine">Automaticky: na USB je rámeček stále připravený (ptá se aspoň každých 5&nbsp;minut), po odpojení mezi fotkami hluboce spí. „Ze sítě“ a „Z baterie“ jsou ruční přepsání pro ladění. V hlubokém spánku se ladicí režim a „Zobrazit hned“ projeví až po probuzení (KEY ho probudí hned).</p>
+  </fieldset>
+
+  <div class="settings__actions">
+    <button class="button" type="submit">Uložit</button>
+  </div>
+</form>
+{% endblock %}

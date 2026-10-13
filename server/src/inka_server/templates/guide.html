@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Návod – Inka{% endblock %}
+{% block body %}
+<article class="guide">
+  <h1>Návod</h1>
+  <p class="lede">Rámeček většinu času spí. Jednou za čas se probudí, stáhne fotku, překreslí se a znovu usne. Obraz na displeji zůstane, i když je rámeček vypnutý.</p>
+
+  <section>
+    <h2>Tlačítka</h2>
+    <p>Jsou na zadní straně, zleva KEY, BOOT a PWR.</p>
+    <dl class="defs">
+      <dt>KEY</dt>
+      <dd>Probudí rámeček a hned ukáže další fotku. Když jste na webu zvolili „Další na řadě“, ukáže tuhle fotku.</dd>
+      <dt>BOOT</dt>
+      <dd>Jen pro servis (nahrávání firmwaru). Při běžném používání ho nemačkejte.</dd>
+      <dt>PWR</dt>
+      <dd>Zapnutí: krátký stisk (rámeček hned stáhne fotku a překreslí se). Vypnutí: podržet asi 2&nbsp;sekundy, dokud červená kontrolka třikrát nezabliká, a pustit. Rámeček se ještě jednou překreslí (asi 30&nbsp;s, červená svítí), v pravém dolním rohu fotky nechá štítek <strong>OFF</strong> a vypne se. Displej si obraz drží i vypnutý.</dd>
+    </dl>
+  </section>
+
+  <section>
+    <h2>Kontrolky</h2>
+    <dl class="defs">
+      <dt>ACT</dt>
+      <dd>Svítí zeleně, když rámeček stahuje a překresluje fotku. Zhasne, když se uloží ke spánku.</dd>
+      <dt>PWR</dt>
+      <dd>Červená: třikrát zabliká a pak svítí, když se rámeček vypíná. Svítí trvale bez překreslování: rámeček nemá nastavenou Wi-Fi a server.</dd>
+    </dl>
+  </section>
+
+  <section>
+    <h2>Co je normální</h2>
+    <ul>
+      <li>Překreslení trvá asi 30&nbsp;sekund a displej při něm několikrát problikne. Tak e-ink funguje.</li>
+      <li>Fotka se mění podle intervalu v Nastavení. Při napájení ze sítě se rámeček na server ptá aspoň každých 5&nbsp;minut, takže se změny projeví nejpozději do 5&nbsp;minut.</li>
+      <li>Barvy jsou tlumené a matné, jako u tisku. Displej nesvítí, takže ve tmě obraz není vidět.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Napájení</h2>
+    <ul>
+      <li><strong>Ze sítě</strong> (Nastavení → Napájení): rámeček je stále zapnutý a ptá se aspoň každých 5&nbsp;minut.</li>
+      <li><strong>Z baterie:</strong> mezi fotkami hluboce spí a probudí se jen na výměnu fotky. KEY ho probudí hned, podržení PWR ho vypne i ze spánku. Změna nastavení se projeví až při dalším probuzení.</li>
+      <li>Na hlavní stránce je vidět stav baterie, nabíjení a teplota v místnosti.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Fotky</h2>
+    <ul>
+      <li><strong>Přidat:</strong> tlačítkem „Přidat fotky“ na hlavní stránce, přetažením do okna, nebo vložením do synchronizované složky.</li>
+      <li><strong>Další na řadě:</strong> fotka se ukáže při nejbližším probuzení, nebo hned po stisku KEY.</li>
+      <li><strong>Zobrazit hned:</strong> zapne na hodinu ladicí režim (rámeček se ptá každých 30&nbsp;s) a fotku pošle při nejbližším dotazu, obvykle do minuty i s překreslením.</li>
+      <li><strong>Vyřadit:</strong> fotka zůstane ve složce, jen ji rámeček nebude ukazovat.</li>
+      <li><strong>Porovnat:</strong> originál a e-ink vedle sebe, i na 100&nbsp;%. Posuvníky tónu se projeví hned; „Uložit jako výchozí“ je pošle rámečku.</li>
+    </ul>
+  </section>
+
+  <section>
+    <h2>Když něco nefunguje</h2>
+    <ul>
+      <li>Na hlavní stránce je vidět, kdy se rámeček naposledy ozval. Když je to déle než interval, zkontrolujte napájení a Wi-Fi a stiskněte KEY.</li>
+      <li>Fotka se nezměnila po stisku KEY: počkejte 30&nbsp;sekund na překreslení.</li>
+    </ul>
+  </section>
+</article>
+{% endblock %}
